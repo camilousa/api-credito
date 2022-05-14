@@ -1,10 +1,20 @@
 from fastapi import FastAPI, Form
 import joblib
+import boto3
+import os
 
 app = FastAPI()
 
-pipeline = joblib.load("modelos/pipeline1.joblib")
-modelo = joblib.load("modelos/model01.joblib")
+s3 = boto3.resource('s3', 'us-east-1')
+s3.meta.client.download_file('modelo-credito-255423', 'modelos/pipeline1.joblib', 'pipeline.joblib')
+s3.meta.client.download_file('modelo-credito-255423', 'modelos/model01.joblib', 'model.joblib')
+
+pipeline = joblib.load('pipeline.joblib')
+modelo = joblib.load('model.joblib')
+
+os.remove('pipeline.joblib')
+os.remove('model.joblib')
+
 
 
 @app.post("/predict")
